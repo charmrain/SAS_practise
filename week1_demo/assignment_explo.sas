@@ -33,3 +33,24 @@ proc freq data=pg1.storm_summary order=freq;
 	*Add a FORMAT statement;
 	format  StartDate  MONNAME.;
 run;
+
+
+proc sort data=pg1.np_summary out=np_sort;
+    by Reg descending DayVisits;
+    where Type='NP';
+    
+    run;
+
+ proc print data=pg1.np_largeparks ;
+        where State = 'MN';
+        run;
+        
+
+proc sort data=pg1.np_largeparks out=park_clean
+        nodupkey dupout=park_dups;
+        by _all_;
+        run;
+
+
+        
+
