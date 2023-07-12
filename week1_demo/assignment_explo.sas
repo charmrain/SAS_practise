@@ -60,3 +60,30 @@ data Storm_cat5;
     where MaxWindMPH>=156 and StartDate>="01Jan2000"d;
     keep Season Basin Name Type MaxWindMPH;
     run;
+
+
+/* create a temporary table */
+
+data eu_occ2016  ;
+	set pg1.eu_occ ;
+	where YearMon like '2016%';
+	format Hotel ShortStay Camp Comma17. ;
+	drop Geo;
+run;
+
+
+/* below shows how to create a permanent table under an existed folder */
+
+libname out "~/EPG1V2/output";
+
+data out.fox;
+    set pg1.np_species;
+    where Category='Mammal' and Common_Names like 
+          '%Fox%' and Common_Names not like 
+          '%Squirrel%';    
+    drop Category Record_Status Occurrence Nativeness;
+run;
+
+proc sort data=out.fox;
+    by Common_Names;
+run;
