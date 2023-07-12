@@ -53,4 +53,10 @@ proc sort data=pg1.np_largeparks out=park_clean
 
 
         
+/* create data table */
 
+data Storm_cat5;
+    set pg1.storm_summary;
+    where MaxWindMPH>=156 and StartDate>="01Jan2000"d;
+    keep Season Basin Name Type MaxWindMPH;
+    run;
