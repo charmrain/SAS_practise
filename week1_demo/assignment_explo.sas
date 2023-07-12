@@ -87,3 +87,30 @@ run;
 proc sort data=out.fox;
     by Common_Names;
 run;
+
+/* use a function to create new columns */
+
+data storm_length;
+	set pg1.storm_summary;
+	drop Hem_EW Hem_NS Lat Lon;
+	StormLength = EndDate - StartDate +1;
+	*Add assignment statement;
+run;
+
+
+data storm_wingavg;
+	set pg1.storm_range;
+	*Add assignment statements;
+	WindAvg = mean(wind1, wind2, wind3, wind4);
+	WindRange = Range(wind1, wind2, wind3, wind4);
+run;
+
+/* the substr usage */
+data pacific;
+	set pg1.storm_summary;
+	drop Type Hem_EW Hem_NS MinPressure Lat Lon;
+	*Add a WHERE statement that uses the SUBSTR function;
+	where SUBSTR(Basin, 2, 1) = 'P';
+run;
+
+
