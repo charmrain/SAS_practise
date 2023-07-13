@@ -114,3 +114,108 @@ data pacific;
 run;
 
 
+/* format the new columns */
+data np_summary_update;
+    set pg1.np_summary;
+    keep Reg ParkName DayVisits OtherLodging Acres 
+         SqMiles Camping;
+    SqMiles=Acres*.0015625;
+    Camping=sum(OtherCamping,TentCampers,
+                RVCampers,BackcountryCampers);
+    format SqMiles comma6. Camping comma10.;
+run;
+
+
+/* compare the key and my answer */
+/* key: */
+data eu_occ_total;
+    set pg1.eu_occ;
+    Year=substr(YearMon,1,4);
+    Month=substr(YearMon,6,2);
+    ReportDate=MDY(Month,1,Year);
+    Total=sum(Hotel,ShortStay,Camp);
+    format Hotel ShortStay Camp Total comma17.
+           ReportDate monyy7.;
+    keep Country Hotel ShortStay Camp ReportDate Total;
+run;
+
+/* my answer */
+data eu_ooc_total;
+    set pg1.eu_occ;
+    Year = substr(YearMon, 1, 4);
+    Month = substr(YearMon, 6, 2);
+    ReportDate = MDY(Month, 1, Year);
+    Total = sum(hotel, shortstay, camp);
+    Format hotel shortstay camp total comma. reportdate MONYY7.;
+    keep country hotel shortstay camp reportdate total;
+    run;
+
+/* if else flow */
+
+data storm_cat;
+	set pg1.storm_summary;
+	keep Name Basin MinPressure StartDate PressureGroup;
+	*add ELSE keyword and remove final condition;
+	if MinPressure=. then PressureGroup=.;
+	else if MinPressure<=920 then PressureGroup=1;
+	else PressureGroup=0;
+run;
+
+proc freq data=storm_cat;
+	tables PressureGroup;
+run;
+
+
+/* the position of length statement is important */
+
+data storm_summary2;
+
+	set pg1.storm_summary;
+	*Add a LENGTH statement;
+    length Ocean $10.;	
+	keep Basin Season Name MaxWindMPH Ocean;
+	*Add assignment statement;
+	Basin = upcase(Basin);
+	OceanCode=substr(Basin,2,1);
+	if OceanCode="I" then Ocean="Indian";
+	else if OceanCode="A" then Ocean="Atlantic";
+	else Ocean="Pacific";
+
+
+run;
+
+/* a if then else statements */
+
+data park_type;
+	set pg1.np_summary;
+	*Add IF-THEN-ELSE statements;
+	if type = 'NM' Then ParkType = 'Monument';
+	else if type = 'NP' Then ParkType = 'Park';
+	else if type in ('NPRE', 'PRE', 'PRESERVE') Then ParkType = 'Preserve';
+	else if type = 'NS' THEN ParkType = 'Seashore';
+	else ParkType = 'River';
+run;
+
+proc freq data=park_type;
+	tables ParkType;
+run;
+
+/* create two tables, assign different rows by condition */
+data parks monuments;
+    set pg1.np_summary;
+    where type in ('NM', 'NP');
+    Campers=sum(OtherCamping, TentCampers, RVCampers,
+                BackcountryCampers);
+    format Campers comma17.;
+    length ParkType $ 8;
+    if type='NP' then do;
+        ParkType='Park';
+        output parks;
+    end;
+    else do;
+        ParkType='Monument';
+        output monuments;
+    end;
+    keep Reg ParkName DayVisits OtherLodging Campers 
+         ParkType;
+run;
