@@ -219,3 +219,5 @@ data parks monuments;
     keep Reg ParkName DayVisits OtherLodging Campers 
          ParkType;
 run;
+
+/* set the titile with a %let clause to use the same data several times */
