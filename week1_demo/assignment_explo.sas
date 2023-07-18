@@ -221,3 +221,79 @@ data parks monuments;
 run;
 
 /* set the titile with a %let clause to use the same data several times */
+
+/* display the label in print by add the label option */
+data cars_update;
+    set sashelp.cars;
+	keep Make Model MSRP Invoice AvgMPG;
+	AvgMPG=mean(MPG_Highway, MPG_City);
+	label MSRP="Manufacturer Suggested Retail Price"
+          AvgMPG="Average Miles per Gallon"
+          Invoice= "Invoice price";
+run;
+
+proc means data=cars_update min mean max;
+    var MSRP Invoice;
+run;
+
+proc print data=cars_update label;
+    var Make Model MSRP Invoice AvgMPG;
+run;
+
+
+/* freq report by month and suppress the print */
+
+title "Frequency Report for Basin and Storm Month";
+
+proc freq data=pg1.storm_final order=freq noprint ;
+	tables StartDate / out=storm_count ;
+	format StartDate monname.;
+run;
+
+
+/* nocum to suppress culmulative columns */
+title "Categories of reported Species";
+proc freq data=pg1.np_species order=freq;
+tables Category/nocum;
+
+
+
+ods graphics on;
+ods noproctitle;
+title1 "Categories of Reported Species";
+title2 "in the Everglades";
+proc freq data=pg1.np_species order=freq;
+    tables Category / nocum plots=freqplot;
+    where Species_ID like "EVER%" and 
+          Category ne "Vascular Plant";
+run;
+title;
+
+/* notice!!! order=freq is the proc option not tables option */
+title "Park Types and Regions";
+proc freq data=pg1.np_codelookup ORDER = freq;
+tables Type*Region / nopercent ;
+where Type not like "Other"; 
+run;
+
+/* my work */
+title "Selected Park Types and Regions";
+proc freq data=pg1.np_codelookup ORDER = freq ;
+tables Type*Region / nocol nopercent crosslist 
+plots=freqplot(Groupby=ROW orient=HORIZONTAL Scale=Percent) ;
+where Type in ("National Historic Site","National Monument", "National Park"); 
+run;
+
+
+/* key */
+title1 'Selected Park Types by Region';
+ods graphics on;
+proc freq data=pg1.np_codelookup order=freq;
+    tables Type*Region /  nocol crosslist 
+           plots=freqplot(groupby=row scale=grouppercent 
+           orient=horizontal);
+    where Type in ('National Historic Site', 
+                   'National Monument', 
+                   'National Park');
+run;
+title;
