@@ -447,3 +447,14 @@ proc tabulate data=pg1.storm_final format=comma5.;
 run;
 title;
 footnote;
+
+
+/* export data */
+
+*  Syntax                                                 *;
+*                                                         *;
+*    PROC EXPORT DATA=input-table                         *;
+*                OUTFILE="output-file"                    *;
+*                <DBMS=identifier> <REPLACE>;             *;
+*    RUN; 
+
