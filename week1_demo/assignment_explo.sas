@@ -466,3 +466,28 @@ data xl_lib.storm_final;
 run;
 
 libname xl_lib clear;
+
+
+/* ODS output  */
+/* ODS sandwitch the main part sas code is the same */
+
+*Add ODS statement;
+ods excel file="&outpath/pressure1.xlsx" style=analysis;
+
+title "Minimum Pressure Statistics by Basin";
+ods noproctitle;
+proc means data=pg1.storm_final mean median min maxdec=0;
+    class BasinName;
+    var MinPressure;
+run;
+
+title "Correlation of Minimum Pressure and Maximum Wind";
+proc sgscatter data=pg1.storm_final;
+	plot minpressure*maxwindmph;
+run;
+title;  
+
+*Add ODS statement;
+
+ods proctitle;
+ods excel close;
