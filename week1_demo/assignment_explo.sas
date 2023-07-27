@@ -574,3 +574,33 @@ title;
 ods proctitle;
 ods rtf close;
 options date;
+
+/* print vs sql */
+
+title "PROC PRINT Output";
+proc print data=pg1.class_birthdate;
+	var Name Age Height Birthdate;
+	format Birthdate date9.;
+run;
+
+title "PROC SQL Output";
+proc sql;
+select Name, Age, Height*2.54 as HeightCM format=5.1, Birthdate format=date9.
+    from pg1.class_birthdate;
+quit;
+
+title;
+
+/* Both procedures provide the input table name, variable list, and format.
+
+PRINT uses multiple statements to specify input data and report contents. SQL uses one statement.
+
+PRINT separates variables with spaces. SQL separates variables with commas.
+
+PRINT ends with a RUN statement. SQL ends with a QUIT statement.
+
+SQL allows computed columns in the SELECT clause. The expression is listed first, followed by the column name.
+
+PRINT adds the OBS column by default.*/
+
+
