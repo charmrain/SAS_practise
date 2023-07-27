@@ -603,4 +603,13 @@ SQL allows computed columns in the SELECT clause. The expression is listed first
 
 PRINT adds the OBS column by default.*/
 
+/* becareful, no comma or , after the last var */
 
+proc sql;
+    select Event,
+           Cost format=dollar16.,  
+           year(Date) as Season
+        from pg1.storm_damage
+        where Cost>25000000000
+        order by Cost desc;
+    quit;
