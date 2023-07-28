@@ -613,3 +613,16 @@ proc sql;
         where Cost>25000000000
         order by Cost desc;
     quit;
+
+
+/* inner join example */
+
+proc sql;
+    select Season, Name, s.Basin, b.BasinName, MaxWindMPH 
+        from pg1.storm_summary as s  inner join  pg1.storm_basincodes as b
+            on  s.Basin = b.Basin
+        order by Season desc, s.Name;
+    quit;
+
+
+    
